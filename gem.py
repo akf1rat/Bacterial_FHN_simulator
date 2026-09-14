@@ -6,9 +6,8 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import minimize
 from sklearn.metrics import r2_score, root_mean_squared_error
 
-# ============================================================
-# PAGE CONFIGURATION
-# ============================================================
+
+# PAGE 
 st.set_page_config(
     page_title="Bacterial FHN Model & Parameter Fitting Platform",
     page_icon="🦠",
@@ -20,9 +19,9 @@ st.caption("Modified FitzHugh-Nagumo (FHN) model simulation, phase-plane analysi
 
 tab_sim, tab_fit = st.tabs(["Interactive Simulation & Phase Portrait", "Experimental Data Fitting Engine"])
 
-# ============================================================
+
 # CORE MODEL FUNCTIONS
-# ============================================================
+
 def get_beta(k_K):
     return 1.0 - 0.1 * np.log(k_K)
 
@@ -64,9 +63,9 @@ def solve_fhn(k_K, alpha, V_m0, t_on, t_off, i_v, i_w, t_eval):
     )
     return sol, V_eq, W_eq
 
-# ============================================================
+
 # TAB 1: INTERACTIVE SIMULATION & PHASE PORTRAIT
-# ============================================================
+
 with tab_sim:
     st.sidebar.header("Simulation Settings")
     pulse_start = st.sidebar.slider("Stimulus Onset (s)", 0.0, 5.0, 1.0, 0.25)
@@ -105,7 +104,7 @@ with tab_sim:
     dVm_prof = -(sol_prof.y[0] - V_eq_p)
     dVm_inh = -(sol_inh.y[0] - V_eq_i)
 
-    # State classification callout for Test Cell
+    # State classification callout for test Cell
     if k_K_custom >= 5.0:
         st.success(f"**Test Cell State: Proliferative-likely** (k_K = {k_K_custom:.2f}) — Exhibits sharp excitable hyperpolarization excursion")
     elif k_K_custom <= 1.0:
@@ -144,7 +143,7 @@ with tab_sim:
         fig_phase.add_trace(go.Scatter(x=v_range, y=w_nullcline_v, mode="lines", name="V-Nullcline", line=dict(color="#1f77b4", width=1.5)))
         fig_phase.add_trace(go.Scatter(x=v_range, y=w_nullcline_w, mode="lines", name="W-Nullcline", line=dict(color="#d62728", width=1.5)))
         fig_phase.add_trace(go.Scatter(x=v_traj, y=w_traj, mode="lines", name="Cell Trajectory", line=dict(color="#2ca02c", width=2.5)))
-        fig_phase.add_trace(go.Scatter(x=[V_eq_c], y=[W_eq_c], mode="markers", name="Equilibrium", marker=dict(size=9, color="green", symbol="circle")))
+        fig_phase.add_trace(go.Scatter(x=[V_eq_c], y=[W_eq_c], mode="markers", name="Equilibrium", marker=dict(size=9, color="magenta", symbol="circle")))
 
         fig_phase.update_layout(
             xaxis_title="V_m", 
@@ -161,9 +160,8 @@ with tab_sim:
     df_sim_export = pd.DataFrame({"Time_s": t_array, "dVm_custom": dVm_custom, "dVm_proliferative": dVm_prof, "dVm_inhibited": dVm_inh})
     st.download_button(label="Export Simulation Traces (CSV)", data=df_sim_export.to_csv(index=False).encode('utf-8'), file_name="bacterial_fhn_simulation.csv", mime="text/csv")
 
-# ============================================================
+
 # TAB 2: EXPERIMENTAL DATA FITTING ENGINE
-# ============================================================
 with tab_fit:
     st.subheader("Inverse Parameter Extraction & Cell State Inference")
     st.markdown("Upload experimental optical or electrical recording data containing time and fluorescence change (`-ΔV_m`).")
